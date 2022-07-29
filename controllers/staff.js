@@ -32,7 +32,7 @@ exports.createStaff = async(req, res) => {
 }
 
 exports.updateStaff = async(req, res) => {
-  const id = req.params._id
+  const id = req.params.id
   const { 
     name, email, phoneNumber, address, city, state, zipCode, avatarUrl, isVerified, status, company, role
   } = req.body

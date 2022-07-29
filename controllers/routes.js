@@ -15,11 +15,11 @@ exports.getRoute = async (req, res, next) => {
 
 exports.createRoute = async(req, res) => {
   const { 
-    customer, routeNumber, routeID, cistartDateTimety, endDateTime, origin, destination, distance, stopAddresses, driver, truck
+    customer, routeNumber, routeID, startDateTime, endDateTime, origin, destination, distance, stopAddresses, driver, truck
   } = req.body
 
   const newRoute = {
-    customer, routeNumber, routeID, cistartDateTimety, endDateTime, origin, destination, distance, stopAddresses, driver, truck,
+    customer, routeNumber, routeID, startDateTime, endDateTime, origin, destination, distance, stopAddresses, driver, truck,
     status: 'Scheduled'
   }
 
@@ -32,13 +32,13 @@ exports.createRoute = async(req, res) => {
 }
 
 exports.updateRoute = async(req, res) => {
-  const id = req.params._id
+  const id = req.params.id
   const { 
-    customer, routeNumber, routeID, cistartDateTimety, endDateTime, origin, destination, distance, stopAddresses, driver, truck, status
+    customer, routeNumber, routeID, startDateTime, endDateTime, origin, destination, distance, stopAddresses, driver, truck, status
   } = req.body
   await Route.findByIdAndUpdate(
     { _id: id },
-    { customer, routeNumber, routeID, cistartDateTimety, endDateTime, origin, destination, distance, stopAddresses, driver, truck, status })
+    { customer, routeNumber, routeID, startDateTime, endDateTime, origin, destination, distance, stopAddresses, driver, truck, status })
     .then((route) => res.json({ route }))
     .catch((error) => res.status(400).send(error.message))
 }

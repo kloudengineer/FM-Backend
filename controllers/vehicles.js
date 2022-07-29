@@ -31,7 +31,7 @@ exports.createVehicle = async(req, res) => {
 }
 
 exports.updateVehicle = async(req, res) => {
-  const id = req.params._id
+  const id = req.params.id
   const { 
     vehicleId, vehicleType, truckNumber, vinNumber, plateNumber, make, model, year, latestInspection, latestMaintenance, latestAcquiryDate, latestReturnDate, buyOrRentalDate, soldOrRentalDate
   } = req.body

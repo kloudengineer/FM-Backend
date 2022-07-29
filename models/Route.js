@@ -6,14 +6,16 @@ const routeSchema = new mongoose.Schema(
     customer: { type: String },
     routeNumber: { type: String },
     routeID: { type: String },
-    numberOfStops: { type: Number },
-    startDateTime: { type: Date },
-    endDateTime: { type: Date },
+    startDateTime: { type: String },
+    endDateTime: { type: String },
     origin: { type: String },
     destination: { type: String },
-    distance: { type: String },
+    distance: { type: Number },
     stopAddresses: [
-      { address: String },
+      { 
+        address: String,
+        arrivalDateTime: String
+      },
     ],
     driver: {
       type: ObjectId,
