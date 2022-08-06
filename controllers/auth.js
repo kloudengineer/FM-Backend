@@ -2,11 +2,12 @@ const Carrier = require('../models/Carrier');
 
 exports.register = async(req, res) => {
   const { 
-    uid, firstName, lastName, email, companyName, registration, address, ein, dot
+    uid, email, firstName, lastName, phoneNumber, companyName, address, ein, dot
   } = req.body
 
   const newCarrier = {
-    uid, firstName, lastName, email, companyName, registration, address, ein, dot
+    uid, email, firstName, lastName, phoneNumber, companyName, address, ein, dot, 
+    status: 'In Review'
   }
 
   await new Carrier(newCarrier).save()

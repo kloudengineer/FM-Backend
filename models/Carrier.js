@@ -11,7 +11,11 @@ const carrierSchema = new mongoose.Schema(
     registration: { type: String },
     address: { type: String },
     ein: { type: String },
-    dot: { type: String }
+    dot: { type: String },
+    status: {
+      type: String,
+      enum: ['In Review', 'Active', 'Inactive']
+    }
   },
   { timestamps: true }
 );

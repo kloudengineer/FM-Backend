@@ -15,11 +15,11 @@ exports.getStaff = async (req, res, next) => {
 
 exports.createStaff = async(req, res) => {
   const { 
-    name, email, phoneNumber, address, city, state, zipCode, avatarUrl, isVerified, company, role
+    avatarUrl, firstName, lastName, email, phoneNumber, dateOfBirth, ssn, address, license, medicalCard, workHistory
   } = req.body
 
   const newStaff = {
-    name, email, phoneNumber, address, city, state, zipCode, avatarUrl, isVerified, company, role,
+    avatarUrl, firstName, lastName, email, phoneNumber, dateOfBirth, ssn, address, license, medicalCard, workHistory,
     status: 'In Review'
   }
 
@@ -34,11 +34,11 @@ exports.createStaff = async(req, res) => {
 exports.updateStaff = async(req, res) => {
   const id = req.params.id
   const { 
-    name, email, phoneNumber, address, city, state, zipCode, avatarUrl, isVerified, status, company, role
+    avatarUrl, firstName, lastName, email, phoneNumber, dateOfBirth, ssn, address, license, medicalCard, workHistory, status
   } = req.body
   await Staff.findByIdAndUpdate(
     { _id: id },
-    { name, email, phoneNumber, address, city, state, zipCode, avatarUrl, isVerified, status, company, role })
+    { avatarUrl, firstName, lastName, email, phoneNumber, dateOfBirth, ssn, address, license, medicalCard, workHistory, status })
     .then((staff) => res.json({ staff: staff }))
     .catch((error) => res.status(400).send(error.message))
 }

@@ -10,12 +10,12 @@ const vehicleSchema = new mongoose.Schema(
     make: { type: String },
     model: { type: String },
     year: { type: Number },
-    latestInspection: { type: Date },
-    latestMaintenance: { type: Date },
+    latestInspectionDate: { type: Date },
+    latestMaintenanceDate: { type: Date },
     latestAcquiryDate: { type: Date },
     latestReturnDate: { type: Date },
     buyOrRentalDate: { type: Date },
-    soldOrRentalDate: { type: Date }
+    soldOrReturnDate: { type: Date }
   },
   { timestamps: true }
 );

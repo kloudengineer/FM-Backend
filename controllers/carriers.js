@@ -13,6 +13,13 @@ exports.getCarrier = async (req, res, next) => {
     .catch((error) => res.status(400).send(error.message))
 }
 
+exports.findCarriers = async (req, res, next) => {
+  const filter = req.body
+  await Carrier.find(filter)
+    .then((carriers) => res.json({ carriers }))
+    .catch((error) => res.status(400).send(error.message))
+}
+
 exports.createCarrier = async(req, res) => {
   const { 
     firstName, lastName, phoneNumber, email, companyName, registration, address, ein, dot

@@ -6,6 +6,13 @@ exports.listRoutes = async (req, res) => {
     .catch((error) => res.status(400).send(error.message))
 }
 
+exports.findRoutes = async (req, res, next) => {
+  const filter = req.body
+  await Route.find(filter)
+    .then((routes) => res.json({ routes }))
+    .catch((error) => res.status(400).send(error.message))
+}
+
 exports.getRoute = async (req, res, next) => {
   id = req.params.id;
   await Route.findById(id)

@@ -6,6 +6,13 @@ exports.listVehicles = async (req, res) => {
     .catch((error) => res.status(400).send(error.message))
 }
 
+exports.findVehicles = async (req, res, next) => {
+  const filter = req.body
+  await Vehicle.find(filter)
+    .then((vehicles) => res.json({ vehicles }))
+    .catch((error) => res.status(400).send(error.message))
+}
+
 exports.getVehicle = async (req, res, next) => {
   id = req.params.id;
   await Vehicle.findById(id)
@@ -15,11 +22,11 @@ exports.getVehicle = async (req, res, next) => {
 
 exports.createVehicle = async(req, res) => {
   const { 
-    vehicleId, vehicleType, truckNumber, vinNumber, plateNumber, make, model, year, latestInspection, latestMaintenance, latestAcquiryDate, latestReturnDate, buyOrRentalDate, soldOrRentalDate
+    vehicleId, vehicleType, vinNumber, truckNumber, plateNumber, make, model, year, latestInspectionDate, latestMaintenanceDate, latestAcquiryDate, latestReturnDate, buyOrRentalDate, soldOrReturnDate
   } = req.body
 
   const newVehicle = {
-    vehicleId, vehicleType, truckNumber, vinNumber, plateNumber, make, model, year, latestInspection, latestMaintenance, latestAcquiryDate, latestReturnDate, buyOrRentalDate, soldOrRentalDate
+    vehicleId, vehicleType, vinNumber, truckNumber, plateNumber, make, model, year, latestInspectionDate, latestMaintenanceDate, latestAcquiryDate, latestReturnDate, buyOrRentalDate, soldOrReturnDate
   }
 
   await new Vehicle(newVehicle).save()
@@ -33,7 +40,7 @@ exports.createVehicle = async(req, res) => {
 exports.updateVehicle = async(req, res) => {
   const id = req.params.id
   const { 
-    vehicleId, vehicleType, truckNumber, vinNumber, plateNumber, make, model, year, latestInspection, latestMaintenance, latestAcquiryDate, latestReturnDate, buyOrRentalDate, soldOrRentalDate
+    vehicleId, vehicleType, vinNumber, truckNumber, plateNumber, make, model, year, latestInspectionDate, latestMaintenanceDate, latestAcquiryDate, latestReturnDate, buyOrRentalDate, soldOrReturnDate
   } = req.body
   await Vehicle.findByIdAndUpdate(
     { _id: id },
