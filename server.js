@@ -19,5 +19,6 @@ dbConn.connect();
 
 readdirSync("./routes").map((r) => app.use("/api/v1", require("./routes/" + r)));
 
-app.listen(5000, () => { console.log("Listening on port 5000") })
+const PORT = process.env.PORT || 5000
+app.listen(PORT, () => { console.log(`Listening on port ${PORT}`) })
 
