@@ -3,6 +3,7 @@ const { ObjectId } = mongoose.Schema;
 
 const routeSchema = new mongoose.Schema(
   {
+    carrierId: { type: String },
     customer: { type: String },
     routeNumber: { type: String },
     routeID: { type: String },

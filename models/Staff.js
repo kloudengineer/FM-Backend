@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 
 const staffSchema = new mongoose.Schema(
   {
+    carrierId: { type: String },
     avatarUrl: {
       path: { type: String },
       preview: { type: String }

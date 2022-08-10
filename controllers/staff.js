@@ -1,25 +1,29 @@
 const Staff = require('../models/Staff');
+const { HTTP_STATUS_CODES } = require('../configs/constants')
 
 exports.listStaff = async (req, res) => {
-  await Staff.find()
+  const carrierId = req.user.uid;
+  await Staff.find({ carrierId })
     .then((staff) => res.json({ staff: staff }))
-    .catch((error) => res.status(400).send(error.message))
+    .catch((error) => res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).send(error.message))
 }
 
 exports.getStaff = async (req, res, next) => {
-  id = req.params.id;
-  await Staff.findById(id)
+  const _id = req.params.id;
+  const carrierId = req.user.uid;
+  await Staff.findOne({_id, carrierId})
     .then((staff) => res.json({ staff }))
-    .catch((error) => res.status(400).send(error.message))
+    .catch((error) => res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).send(error.message))
 }
 
 exports.createStaff = async(req, res) => {
+  const carrierId = req.user.uid
   const { 
     avatarUrl, firstName, lastName, email, phoneNumber, dateOfBirth, ssn, address, license, medicalCard, workHistory
   } = req.body
 
   const newStaff = {
-    avatarUrl, firstName, lastName, email, phoneNumber, dateOfBirth, ssn, address, license, medicalCard, workHistory,
+    carrierId, avatarUrl, firstName, lastName, email, phoneNumber, dateOfBirth, ssn, address, license, medicalCard, workHistory,
     status: 'In Review'
   }
 
@@ -27,26 +31,27 @@ exports.createStaff = async(req, res) => {
     .then((staff) => res.json({ staff }))
     .catch((error) => {
       console.log(error)
-      res.status(400).send(error.message)
+      res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).send(error.message)
     })
 }
 
 exports.updateStaff = async(req, res) => {
-  const id = req.params.id
+  const _id = req.params.id
+  const carrierId = req.user.uid
   const { 
     avatarUrl, firstName, lastName, email, phoneNumber, dateOfBirth, ssn, address, license, medicalCard, workHistory, status
   } = req.body
-  await Staff.findByIdAndUpdate(
-    { _id: id },
+  await Staff.updateOne(
+    { _id, carrierId },
     { avatarUrl, firstName, lastName, email, phoneNumber, dateOfBirth, ssn, address, license, medicalCard, workHistory, status })
     .then((staff) => res.json({ staff: staff }))
-    .catch((error) => res.status(400).send(error.message))
+    .catch((error) => res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).send(error.message))
 }
 
 exports.deleteStaff = async(req, res) => {
-  const id = req.params.id;
-  console.log(req.params)
-  await Staff.findOneAndDelete({ _id: id })
+  const _id = req.params.id;
+  const carrierId = req.user.uid
+  await Staff.findOneAndDelete({ _id, carrierId })
     .then((staff) => res.json({ staff: staff }))
-    .catch((error) => res.status(400).send(error.message))
+    .catch((error) => res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).send(error.message))
 }

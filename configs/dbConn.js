@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const dbUri = "mongodb+srv://dbuser:Bv86fljCt0pY0fd7@cluster0.4qxmn3t.mongodb.net/fmdb?retryWrites=true&w=majority"
+const dbUri = `mongodb+srv://${process.env.MONGODB_USER}:${process.env.MONGODB_PASSWORD}@${process.env.MONGODB_CLUSTER}/${process.env.MONGODB_DBNAME}?retryWrites=true&w=majority`
 
 mongoose.Promise = global.Promise;
 

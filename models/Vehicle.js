@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 
 const vehicleSchema = new mongoose.Schema(
   {
+    carrierId: { type: String },
     vehicleId: { type: String },
     vehicleType: { type: String },
     truckNumber: { type: String },

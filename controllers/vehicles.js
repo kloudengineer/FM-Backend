@@ -1,57 +1,64 @@
 const Vehicle = require('../models/Vehicle');
+const { HTTP_STATUS_CODES } = require('../configs/constants')
 
 exports.listVehicles = async (req, res) => {
-  await Vehicle.find()
+  const carrierId = req.user.uid
+  await Vehicle.find({ carrierId })
     .then((vehicles) => res.json({ vehicles }))
-    .catch((error) => res.status(400).send(error.message))
+    .catch((error) => res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).send(error.message))
 }
 
 exports.findVehicles = async (req, res, next) => {
   const filter = req.body
-  await Vehicle.find(filter)
+  const carrierId = req.user.uid
+  await Vehicle.find({ carrierId, ...filter })
     .then((vehicles) => res.json({ vehicles }))
-    .catch((error) => res.status(400).send(error.message))
+    .catch((error) => res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).send(error.message))
 }
 
 exports.getVehicle = async (req, res, next) => {
-  id = req.params.id;
-  await Vehicle.findById(id)
+  const _id = req.params.id;
+  const carrierId = req.user.uid
+  await Vehicle.findOne({ _id, carrierId })
     .then((vehicle) => res.json({ vehicle }))
-    .catch((error) => res.status(400).send(error.message))
+    .catch((error) => res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).send(error.message))
 }
 
 exports.createVehicle = async(req, res) => {
+  const carrierId = req.user.uid
   const { 
     vehicleId, vehicleType, vinNumber, truckNumber, plateNumber, make, model, year, latestInspectionDate, latestMaintenanceDate, latestAcquiryDate, latestReturnDate, buyOrRentalDate, soldOrReturnDate
   } = req.body
 
   const newVehicle = {
-    vehicleId, vehicleType, vinNumber, truckNumber, plateNumber, make, model, year, latestInspectionDate, latestMaintenanceDate, latestAcquiryDate, latestReturnDate, buyOrRentalDate, soldOrReturnDate
+    carrierId, vehicleId, vehicleType, vinNumber, truckNumber, plateNumber, make, model, year, latestInspectionDate, latestMaintenanceDate, latestAcquiryDate, latestReturnDate, buyOrRentalDate, soldOrReturnDate
   }
 
   await new Vehicle(newVehicle).save()
     .then((vehicle) => res.json({ vehicle }))
     .catch((error) => {
       console.log(error)
-      res.status(400).send(error.message)
+      res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).send(error.message)
     })
 }
 
 exports.updateVehicle = async(req, res) => {
-  const id = req.params.id
+  const _id = req.params.id
+  const carrierId = req.user.uid
   const { 
     vehicleId, vehicleType, vinNumber, truckNumber, plateNumber, make, model, year, latestInspectionDate, latestMaintenanceDate, latestAcquiryDate, latestReturnDate, buyOrRentalDate, soldOrReturnDate
   } = req.body
-  await Vehicle.findByIdAndUpdate(
-    { _id: id },
+  await Vehicle.updateOne(
+    { _id, carrierId },
     { vehicleId, vehicleType, truckNumber, vinNumber, plateNumber, make, model, year, latestInspection, latestMaintenance, latestAcquiryDate, latestReturnDate, buyOrRentalDate, soldOrRentalDate })
     .then((vehicle) => res.json({ vehicle }))
-    .catch((error) => res.status(400).send(error.message))
+    .catch((error) => res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).send(error.message))
 }
 
 exports.deleteVehicle = async(req, res) => {
-  const id = req.params.id;
-  await Vehicle.findOneAndDelete({ _id: id })
+  const _id = req.params.id
+  const carrierId = req.user.uid
+  await Vehicle.findOneAndDelete({ _id, carrierId })
     .then((vehicle) => res.json({ vehicle }))
-    .catch((error) => res.status(400).send(error.message))
+    .catch((error) => res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).send(error.message))
 }
