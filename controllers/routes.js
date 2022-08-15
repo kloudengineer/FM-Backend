@@ -4,7 +4,9 @@ const { HTTP_STATUS_CODES } = require('../configs/constants')
 exports.listRoutes = async (req, res) => {
   const carrierId = req.user.uid;
   await Route.find({ carrierId })
-    .then((routes) => res.json({ routes }))
+    .populate('driver')
+    .populate('truck')
+    .then((routes) => { console.log(routes); res.json({ routes });})
     .catch((error) => res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).send(error.message))
 }
 
@@ -12,6 +14,8 @@ exports.findRoutes = async (req, res, next) => {
   const filter = req.body
   const carrierId = req.user.uid;
   await Route.find({ carrierId, ...filter })
+    .populate('driver')
+    .populate('truck')
     .then((routes) => res.json({ routes }))
     .catch((error) => res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).send(error.message))
 }
@@ -20,6 +24,8 @@ exports.getRoute = async (req, res, next) => {
   const _id = req.params.id;
   const carrierId = req.user.uid;
   await Route.findOne({_id, carrierId})
+    .populate('driver')
+    .populate('truck')
     .then((route) => res.json({ route }))
     .catch((error) => res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).send(error.message))
 }
