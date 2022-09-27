@@ -5,8 +5,8 @@ const notificationsSchema = new mongoose.Schema(
     action: { type: String, required: true }, //?medical card expired/ route not assigned
     notificationType: { type: String, required: true }, //? staff notification
     count: { type: Number, required: true }, //? 0 = how may times send notification
-    status: { type: Boolean, required: true }, //? true=readed/false=ignored
-    refId: { type: String, required: true }, //? staff/route/vehicel Id
+    status: { type: String, enum: ["Warning", "blocking"], required: true }, //? notification status like warning or blocking.
+    refId: { type: mongoose.Schema.Types.ObjectId, ref: "Staff" }, //? staff/route/vehicel Id
   },
   { timestamps: true }
 );
