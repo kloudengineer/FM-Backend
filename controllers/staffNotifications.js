@@ -4,10 +4,12 @@ const nodemailer = require("nodemailer");
 const { emailTemplate } = require("../documents/emailTemplate.js");
 
 exports.sendStaffNotification = async (req, res) => {
+  // add where status == 'verify"
   const staffExpCardDates = await Staff.find().select(
     "firstName lastName email phoneNumber license medicalCard status"
   );
-  console.log("Staff_List = ", staffExpCardDates);
+  //   console.log("Staff_List : ", staffExpCardDates, "\n");
+
   //   let notificationCreatedResult = {};
   const calculateExpireDates = (d2) => {
     let date1 = new Date(Date.now());
@@ -21,19 +23,21 @@ exports.sendStaffNotification = async (req, res) => {
     userID,
     firstName,
     email,
-    status,
     cardName
   ) => {
     let = count = 0;
     // let laterSendWarnNotif = {};
+    //* this way gives us a better scope area to access the variable.
+    const staffNotification = await Notifications.findOne({
+      refId: userID,
+    })
+      .where("action")
+      .equals(cardName);
 
     if (expDate >= -3 && expDate <= 0) {
-      const staffNotification = await Notifications.findOne({
-        refId: userID,
-      });
       console.log(
-        "1-user searching is =",
-        staffNotification == true ? "found" : "false"
+        "Warning : Staff_Searching_Result : ",
+        staffNotification ? "Found" : "Not Found"
       );
 
       if (!staffNotification) {
@@ -48,7 +52,7 @@ exports.sendStaffNotification = async (req, res) => {
         return await new Notifications(newNotification)
           .save()
           .then((result) => {
-            console.log("Warning Notfication_Saved==", result);
+            console.log("Warning Notfication_Saved==", result, "\n");
             //?this object only taking values.
             // laterSendWarnNotif = {
             //   firstName,
@@ -64,20 +68,25 @@ exports.sendStaffNotification = async (req, res) => {
             return err.message;
           });
       } else {
-        console.log("Warning count updating is comming soon...");
-        //?update the count to send another notification.
+        console.log(
+          `Warning : ${firstName} count updating is comming soon... \n`
+        );
+        //?if admin ignore last notification more then 3-days
+        //? then -> start Loop : count + 1 and send Email with SMS notification
+        //? if count === 3 stop sending notification
+        //? else  return empty
       }
-    } else if (expDate > 0 && status !== "Inactive") {
-      //todo: if expDate greater then 0 and his status not equal to inactive -> second step :
-      //todo: search user id from ref id's in the notification_DB
-      const staffNotification = await Notifications.findOne({
-        refId: userID,
-      });
+    } else if (expDate > 0) {
+      // && status !== "Inactive"
+      //   const staffNotification = await Notifications.findOne({
+      //     refId: userID,
+      //   });
       console.log(
-        "2-In active_user is : =",
-        staffNotification == true ? "found" : "false"
+        "Inactive : Staff_Searching_Result : ",
+        staffNotification ? "Found" : "Not Found"
       );
       //todo: if user not registered to the DB or it's ID === refId -> second step :
+
       if (!staffNotification || staffNotification.status !== "Inactive") {
         const newNotification = {
           action: cardName,
@@ -92,7 +101,7 @@ exports.sendStaffNotification = async (req, res) => {
           await new Notifications(newNotification)
             .save()
             .then((result) => {
-              console.log("Inactive Notification_saved == ", result);
+              console.log("Inactive : Notification_Saved == ", result, "\n");
               //   emailSend(
               //     laterSendWarnNotif.firstName,
               //     laterSendWarnNotif.cardName,
@@ -110,7 +119,11 @@ exports.sendStaffNotification = async (req, res) => {
           await staffExpCardDates[0]
             .save()
             .then((result) => {
-              console.log("set staff status Inactive = ", result);
+              console.log(
+                "Inactive : Staff_Status_Set_Inactive : ",
+                result,
+                "\n"
+              );
               return result;
             })
             .catch((err) => {
@@ -119,7 +132,9 @@ exports.sendStaffNotification = async (req, res) => {
             })
         );
       } else {
-        console.log("Inactive count updating is comming soon...");
+        console.log(
+          `Inactive : ${firstName} count updating is comming soon...\n`
+        );
         //?update 'In active' notification-saved user count by adding +1.
       }
     }
@@ -147,6 +162,7 @@ exports.sendStaffNotification = async (req, res) => {
       return sendEmail;
     } catch (err) {
       console.log(err.message);
+      return err.message;
     }
   };
 
@@ -158,13 +174,11 @@ exports.sendStaffNotification = async (req, res) => {
       staffExpCardDates[i].medicalCard.expiryDate
     );
 
-    //?add this function arugments to first name and email.
     checkCardExpiration(
       licenseCardResult,
       staffExpCardDates[i]._id,
       staffExpCardDates[i].firstName,
       staffExpCardDates[i].email,
-      staffExpCardDates[i].status,
       "licenseCard"
     );
 
@@ -173,19 +187,16 @@ exports.sendStaffNotification = async (req, res) => {
       staffExpCardDates[i]._id,
       staffExpCardDates[i].firstName,
       staffExpCardDates[i].email,
-      staffExpCardDates[i].status,
       "medicalCard"
     );
   }
-  //   console.log("notifcation saved=", notificationCreatedResult);
-  //?result of save notification.
+
   //* res.status(200).json()
 
   res.status(200).json({ staffExpCardDates });
 
   //?search expired cards in the staff db where status = 'Verified' if true->
   //?then call send notification function to the admin if true->
-  //!then save that notification info to the db
 };
 
 exports.updateStaffNotification = async (req, res) => {
