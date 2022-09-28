@@ -5,9 +5,10 @@ const { emailTemplate } = require("../documents/emailTemplate.js");
 
 exports.sendStaffNotification = async (req, res) => {
   // add where status == 'verify"
-  const staffExpCardDates = await Staff.find().select(
-    "firstName lastName email phoneNumber license medicalCard status"
-  );
+  const staffExpCardDates = await Staff.find()
+    .where("status")
+    .equals("Verified")
+    .select("firstName lastName email phoneNumber license medicalCard status");
   //   console.log("Staff_List : ", staffExpCardDates, "\n");
 
   //   let notificationCreatedResult = {};

@@ -42,8 +42,8 @@ exports.emailTemplate = (firstName, cardName, expDate, email, type) => {
                 <div>
                    <p>${
                      type === "Warning"
-                       ? `Warning for ${firstName}'s ${cardName} will expire after ${expDate}-month and it is email : ${email} `
-                       : `we will set ${firstName} status to -InActive- because it's ${cardName} expired before ${expDate}-month ago and it's email : ${email} `
+                       ? `Warning ${firstName}'s ${cardName} will expire after ${expDate}-month and it's email : ${email} `
+                       : `Warning for inactivation we set ${firstName}'s status to -InActive- because it's ${cardName} expired before ${expDate}-month ago and it's email : ${email} `
                    }</p> Fleet Management
           </div>
       </div>

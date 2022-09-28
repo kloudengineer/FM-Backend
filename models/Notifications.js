@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const notificationsSchema = new mongoose.Schema(
   {
-    action: { type: String, required: true }, //?medical card expired/ route not assigned
+    action: { type: String, required: true }, //?medical card / route not assigned
     notificationType: { type: String, required: true }, //? staff notification
     count: { type: Number, required: true }, //? 0 = how may times send notification
     status: { type: String, enum: ["Warning", "Inactive"], required: true }, //? notification status like warning or blocking.
