@@ -3,19 +3,22 @@ const Staff = require("../models/Staff");
 const nodemailer = require("nodemailer");
 const { emailTemplate } = require("../documents/emailTemplate.js");
 
-exports.sendStaffNotification = async (req, res) => {
+exports.checkStaffCards = async (req, res) => {
   const staffExpCardDates = await Staff.find().select(
     "firstName lastName email phoneNumber license medicalCard status"
   );
-  let reusltOfCards = [];
-
-  const calculateExpireDates = (d2) => {
+  const calculateDateDifference = (d2, getBy) => {
     let date1 = new Date(Date.now());
     let date2 = new Date(d2);
     let Difference_In_Time = date1.getTime() - date2.getTime();
-
-    return Math.round(Difference_In_Time / (1000 * 3600 * 24 * 30));
+    switch (getBy) {
+      case "month":
+        return Math.round(Difference_In_Time / (1000 * 3600 * 24 * 30));
+      case "day":
+        return Math.round(Difference_In_Time / (1000 * 3600 * 24));
+    }
   };
+
   const checkCardExpiration = async (
     expDate,
     userID,
@@ -160,12 +163,15 @@ exports.sendStaffNotification = async (req, res) => {
     }
   };
 
+  let reusltOfCards = [];
   for (let i = 0; i < staffExpCardDates.length; i++) {
-    const licenseCardResult = calculateExpireDates(
-      staffExpCardDates[i].license.expiryDate
+    const licenseCardResult = calculateDateDifference(
+      staffExpCardDates[i].license.expiryDate,
+      "month"
     );
-    const medicalCardResult = calculateExpireDates(
-      staffExpCardDates[i].medicalCard.expiryDate
+    const medicalCardResult = calculateDateDifference(
+      staffExpCardDates[i].medicalCard.expiryDate,
+      "month"
     );
 
     let license_Result = await checkCardExpiration(
@@ -188,7 +194,7 @@ exports.sendStaffNotification = async (req, res) => {
     console.log("Medical_Card_Result :", medical_Result);
     reusltOfCards.push({ license_Result, medical_Result });
   }
-  res.status(HTTP_STATUS_CODES.SUCCESS).json(reusltOfCards);
+  res.json(reusltOfCards);
 };
 
 exports.updateStaffNotification = async (req, res) => {
