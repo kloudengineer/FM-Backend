@@ -1,7 +1,11 @@
 const Notifications = require("../models/Notifications");
 const Staff = require("../models/Staff");
 const nodemailer = require("nodemailer");
-const { emailTemplate } = require("../documents/emailTemplate.js");
+const {
+  emailTemplate,
+  emailTemplate2,
+} = require("../documents/emailTemplate.js");
+const { count } = require("../models/Notifications");
 
 exports.checkStaffCards = async (req, res) => {
   const staffExpCardDates = await Staff.find().select(
@@ -18,7 +22,114 @@ exports.checkStaffCards = async (req, res) => {
         return Math.round(Difference_In_Time / (1000 * 3600 * 24));
     }
   };
-
+  const checkAdminNotifRes = async (
+    firstName,
+    cardName,
+    expDate,
+    email,
+    type,
+    emailType,
+    userID
+  ) => {
+    const staffNotification = await Notifications.findOne({
+      refId: userID,
+    })
+      .where("action")
+      .equals(cardName);
+    //?admin response if (!adminResponse) the :->
+    //?if count =3 and adminRes == false then count ++ set notificationStatus 'limited'
+    const differenceInDay = calculateDateDifference(
+      staffNotification.createdAt,
+      "day"
+    );
+    console.log("between days =", differenceInDay);
+    if (
+      staffNotification.count == 1 &&
+      staffNotification.notificationStatus !== "limited"
+    ) {
+      if (differenceInDay == 3) {
+        staffNotification.count += 1;
+        staffNotification
+          .save()
+          .then((result) => {
+            console.log("updating count =", result);
+            emailSend(firstName, cardName, expDate, email, type, emailType);
+            return result;
+          })
+          .catch((err) => {
+            return err.message;
+          });
+      } else {
+        return console.log("the admin recives an email for this event today");
+      }
+    } else if (
+      staffNotification.count == 2 &&
+      staffNotification.notificationStatus !== "limited"
+    ) {
+      if (differenceInDay == 3) {
+        staffNotification.count += 1;
+        staffNotification
+          .save()
+          .then((result) => {
+            console.log("updating count =", result);
+            emailSend(firstName, cardName, expDate, email, type, emailType);
+            return result;
+          })
+          .catch((err) => {
+            return err.message;
+          });
+      } else {
+        return;
+      }
+    } else if (
+      staffNotification.count == 3 &&
+      staffNotification.notificationStatus !== "limited"
+    ) {
+      if (differenceInDay == 3) {
+        staffNotification.count += 1;
+        staffNotification
+          .save()
+          .then((result) => {
+            console.log("updating count =", result);
+            emailSend(
+              firstName,
+              cardName,
+              expDate,
+              email,
+              type,
+              emailType,
+              staffNotification.count
+            );
+            return result;
+          })
+          .catch((err) => {
+            return err.message;
+          });
+      } else {
+        return;
+      }
+    }
+    //todo: last else is setting status to limited else do notheing.
+    else {
+      if (
+        staffNotification.count > 3 &&
+        staffNotification.notificationStatus !== "limited"
+      ) {
+        staffNotification.notificationStatus = "limited";
+        staffNotification
+          .save()
+          .then((result) => {
+            console.log("updating notification status =", result);
+            return result;
+          })
+          .catch((err) => {
+            return err.message;
+          });
+      } else {
+        console.log("welcoming message here...");
+      }
+    }
+  };
   const checkCardExpiration = async (
     expDate,
     userID,
@@ -27,7 +138,6 @@ exports.checkStaffCards = async (req, res) => {
     status,
     cardName
   ) => {
-    let = count = 0;
     // let laterSendWarnNotif = {};
     //* this way gives us a better scope area to access the variable.
     const staffNotification = await Notifications.findOne({
@@ -41,12 +151,10 @@ exports.checkStaffCards = async (req, res) => {
       //     "Warning : Staff_Searching_Result : ",
       //     staffNotification ? "Found" : "Not Found"
       //   );
-
       if (!staffNotification) {
         const newNotification = {
           action: cardName,
           notificationType: "staff notification",
-          count,
           status: "Warning",
           refId: userID,
         };
@@ -62,7 +170,14 @@ exports.checkStaffCards = async (req, res) => {
             //   expDate,
             //   email,
             // };
-            emailSend(firstName, result.action, expDate, email, "Warning");
+            emailSend(
+              firstName,
+              result.action,
+              expDate,
+              email,
+              "Warning",
+              "first"
+            );
             return result;
           })
           .catch((err) => {
@@ -70,7 +185,16 @@ exports.checkStaffCards = async (req, res) => {
             return err.message;
           });
       } else {
-        return `warning : ${firstName}'s ${cardName} count updating is comming soon... \n`;
+        checkAdminNotifRes(
+          firstName,
+          cardName,
+          expDate,
+          email,
+          "Warning",
+          "second",
+          userID
+        );
+        return `warning : ${firstName}'s ${cardName} count updating is here... \n`;
 
         //?if admin ignore last notification more then 3-days
         //? then -> start Loop : count + 1 and send Email with SMS notification
@@ -92,7 +216,6 @@ exports.checkStaffCards = async (req, res) => {
         const newNotification = {
           action: cardName,
           notificationType: "staff notification",
-          count,
           status: "Inactive",
           refId: userID,
         };
@@ -103,7 +226,14 @@ exports.checkStaffCards = async (req, res) => {
             .save()
             .then((result) => {
               //   console.log("Inactive : Notification_Saved == ", result, "\n");
-              emailSend(firstName, result.action, expDate, email, "Inactive");
+              emailSend(
+                firstName,
+                result.action,
+                expDate,
+                email,
+                "Inactive",
+                "first"
+              );
               return result;
             })
             .catch((err) => {
@@ -136,7 +266,15 @@ exports.checkStaffCards = async (req, res) => {
       return "Empty";
     }
   };
-  const emailSend = async (firstName, cardName, expDate, email, type) => {
+  const emailSend = async (
+    firstName,
+    cardName,
+    expDate,
+    email,
+    type,
+    emailType,
+    count
+  ) => {
     try {
       const transporter = nodemailer.createTransport({
         host: "smtp.gmail.com",
@@ -147,16 +285,34 @@ exports.checkStaffCards = async (req, res) => {
           pass: process.env.USER_PASS,
         },
       });
-
-      const sendEmail = await transporter.sendMail({
-        from: '"Kloud Engineering" <fleet-management@fleet.com>',
-        to: "abdiaziiz1856@gmail.com",
-        replyTo: "naadir@kloudeng.com",
-        subject: `Their is a warning from Kloud Engineering  for you Mr/Mss Abdiaziiz Abdullahi`,
-        text: "Their is a warning from Kloud Engineering  for you Mr/Mss Abdiaziiz Abdullahi",
-        html: emailTemplate(firstName, cardName, expDate, email, type), // html body if warining call warning template_email
-      });
-      return sendEmail;
+      if (emailType == "first") {
+        const sendFirstEmail = await transporter.sendMail({
+          from: '"Kloud Engineering" <fleet-management@fleet.com>',
+          to: "abdiaziiz1856@gmail.com",
+          replyTo: "naadir@kloudeng.com",
+          subject: `Their is a warning from Kloud Engineering  for you Mr/Mss Abdiaziiz Abdullahi`,
+          text: "Their is a warning from Kloud Engineering  for you Mr/Mss Abdiaziiz Abdullahi",
+          html: emailTemplate(firstName, cardName, expDate, email, type), // html body if warining call warning template_email
+        });
+        return sendFirstEmail;
+      } else {
+        const sendSecondEmail = await transporter.sendMail({
+          from: '"Kloud Engineering" <fleet-management@fleet.com>',
+          to: "abdiaziiz1856@gmail.com",
+          replyTo: "naadir@kloudeng.com",
+          subject: `Their is a warning from Kloud Engineering  for you Mr/Mss Abdiaziiz Abdullahi`,
+          text: "Their is a warning from Kloud Engineering  for you Mr/Mss Abdiaziiz Abdullahi",
+          html: emailTemplate2(
+            firstName,
+            cardName,
+            expDate,
+            email,
+            type,
+            count
+          ), // html body if warining call warning template_email
+        });
+        return sendSecondEmail;
+      }
     } catch (err) {
       console.log(err.message);
       return err.message;
