@@ -98,13 +98,13 @@ exports.emailTemplate2 = (firstName, cardName, expDate, email, type, count) => {
                          ? type === "Warning"
                            ? `Warning ${firstName}'s ${cardName} will expire after ${expDate}-month and it's email : ${email}\n
                             this is the last notification about this event because you reached the limit \n
-                            Please click on the link below to take an action for this event <a href="http://localhost:3000/invited-user">`
+                            Please click on the link below to take an action for this event <a href="http://localhost:">`
                            : `Warning for inactivation we set ${firstName}'s status to -InActive- because it's ${cardName} expired 
                             before ${expDate}-month ago and it's email : ${email} \n 
                             this is the last notification about this event because you reached the limit`
                          : type === "Warning"
                          ? `Warning ${firstName}'s ${cardName} will expire after ${expDate}-month and it's email : ${email}\n
-                            Please click on the link below to take an action for this event <a href="http://localhost:3000/invited-user">`
+                            Please click on the link below to take an action for this event <a href="http://localhost:">`
                          : `Warning for inactivation we set ${firstName}'s status to -InActive- because 
                             it's ${cardName} expired before ${expDate}-month ago and it's email : ${email} `
                      }</p> Fleet Management

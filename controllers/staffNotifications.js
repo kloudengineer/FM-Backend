@@ -62,6 +62,7 @@ exports.checkStaffCards = async (req, res) => {
       } else {
         return console.log("the admin recives an email for this event today");
       }
+      console.log("update notificationStatus ");
     } else if (
       staffNotification.count == 2 &&
       staffNotification.notificationStatus !== "limited"
@@ -116,6 +117,10 @@ exports.checkStaffCards = async (req, res) => {
         staffNotification.notificationStatus !== "limited"
       ) {
         staffNotification.notificationStatus = "limited";
+        console.log(
+          "staffNotification ==",
+          staffNotification.notificationStatus
+        );
         staffNotification
           .save()
           .then((result) => {
