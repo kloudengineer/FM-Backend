@@ -29,6 +29,7 @@ exports.checkStaffCards = async (req, res) => {
       "licenseCard"
     );
     console.log("License_Card_Result :", license_Result);
+
     let medical_Result = await checkCardExpiration(
       medicalCardResult,
       staffExpCardDates[i]._id,
@@ -38,6 +39,7 @@ exports.checkStaffCards = async (req, res) => {
       "medicalCard"
     );
     console.log("Medical_Card_Result :", medical_Result);
+
     reusltOfCards.push({ license_Result, medical_Result });
   }
   res.json(reusltOfCards);

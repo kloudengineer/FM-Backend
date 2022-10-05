@@ -7,9 +7,9 @@ const {
   deleteStaffNotification,
 } = require("../controllers/staffNotifications");
 
-router.post("/staff-notification", checkStaffCards);
+router.get("/staff-notification", checkStaffCards);
 router.put("/staff-notification/:id", updateStaffNotification);
-router.get("/staff-notification", getStaffNotificationList);
+router.get("/staff-notification-list", getStaffNotificationList);
 router.delete("/staff-notification/:id", deleteStaffNotification);
 
 module.exports = router;

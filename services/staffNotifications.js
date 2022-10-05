@@ -47,6 +47,13 @@ const checkAdminNotifRes = async (
         .save()
         .then((result) => {
           emailSend(firstName, cardName, expDate, email, type, emailType);
+          console.log(
+            "an email sent to the admin about : ",
+            firstName,
+            "'s",
+            cardName
+          );
+          console.log("result=", result);
           return result;
         })
         .catch((err) => {
@@ -55,7 +62,7 @@ const checkAdminNotifRes = async (
     } else {
       //? There aren't three days left from the last notification
       //return nothing.
-      return;
+      return "Clear";
     }
   } else if (
     staffNotification.count == 2 &&
@@ -75,7 +82,7 @@ const checkAdminNotifRes = async (
     } else {
       //? There aren't three days left from the last notification
       //return nothing.
-      return;
+      return "you are already have a notification please check you email.";
     }
   } else if (
     staffNotification.count == 3 &&
@@ -102,26 +109,12 @@ const checkAdminNotifRes = async (
         });
     } else {
       //? There aren't three days left from the last notification
-      //return nothing.
-      return;
+      //?if admin say ok to the first notification then don's send any notification
+
+      return "you are already have a notification please check you email.";
     }
   } else {
-    // if (
-    //   staffNotification.count > 3 &&
-    //   staffNotification.notificationStatus !== "limited"
-    // ) {
-    //   staffNotification.notificationStatus = "limited";
-    //   staffNotification
-    //     .save()
-    //     .then((result) => {
-    //       return result;
-    //     })
-    //     .catch((err) => {
-    //       return err.message;
-    //     });
-    // } else {
     return "You reached notifications limit.";
-    // }
   }
 };
 const checkCardExpiration = async (
@@ -170,7 +163,7 @@ const checkCardExpiration = async (
           return err.message;
         });
     } else {
-      return checkAdminNotifRes(
+      return await checkAdminNotifRes(
         firstName,
         cardName,
         expDate,
@@ -179,7 +172,6 @@ const checkCardExpiration = async (
         "second",
         userID
       );
-      //   return `warning : ${firstName}'s ${cardName} count updating is here... \n`;
     }
   } else if (expDate > 0 && status !== "In Review") {
     if (!staffNotification || staffNotification.status !== "Inactive") {
@@ -224,8 +216,7 @@ const checkCardExpiration = async (
         //   })
       );
     } else {
-      //*testing for in active users send second notification to the admin.
-      return checkAdminNotifRes(
+      return await checkAdminNotifRes(
         firstName,
         cardName,
         expDate,
@@ -234,10 +225,9 @@ const checkCardExpiration = async (
         "second",
         userID
       );
-      //   return `Inactive : ${firstName}'s ${cardName} count updating is comming soon...\n`;
     }
   } else {
-    return;
+    return "Clear";
   }
 };
 const emailSend = async (
@@ -287,6 +277,5 @@ const emailSend = async (
 
 module.exports = {
   calculateDateDifference,
-  checkAdminNotifRes,
   checkCardExpiration,
 };
