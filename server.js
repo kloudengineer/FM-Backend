@@ -4,6 +4,7 @@ const dotenv = require("dotenv");
 const { readdirSync } = require("fs");
 const cron = require("node-cron");
 const axios = require("axios");
+
 if (process.env.NODE_ENV !== "production") {
   dotenv.config();
 }
@@ -23,7 +24,6 @@ dbConn.connect();
 
 //*0 */12 * * * run this api every 12 hour one time.
 cron.schedule("*/1 * * * *", async () => {
-  console.log("==> running this task every minute");
   try {
     const notifications = await axios.get(
       "http://localhost:5000/api/v1/staff-notification"

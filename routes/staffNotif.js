@@ -5,7 +5,7 @@ const {
   updateStaffNotification,
   getStaffNotificationList,
   deleteStaffNotification,
-} = require("../controllers/staffNotifications");
+} = require("../controllers/staffNotif");
 
 router.get("/staff-notification", checkStaffCards);
 router.put("/staff-notification/:id", updateStaffNotification);
