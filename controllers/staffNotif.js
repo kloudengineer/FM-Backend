@@ -5,6 +5,7 @@ exports.checkStaffCards = async (req, res) => {
     const staffCardResult = await checkStaffCardsService();
     res.status(200).json(staffCardResult);
   } catch (err) {
+    //status 500
     res.json({ msg: err.message });
   }
 };

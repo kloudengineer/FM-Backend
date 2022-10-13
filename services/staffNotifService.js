@@ -5,6 +5,10 @@ const {
   emailTemplate,
   emailTemplate2,
 } = require("../documents/emailTemplate.js");
+//twilio
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const client = require("twilio")(accountSid, authToken);
 
 const calculateDateDifference = (d2, getBy) => {
   let date1 = new Date(Date.now());
@@ -225,11 +229,32 @@ const emailSend = async (
     return err.message;
   }
 };
+const sendSms = async () => {
+  try {
+    const message = await client.messages.create({
+      body: "hye ibrahim iska waram ",
+      from: "+252617156305",
+      to: "+252617631793",
+    });
+    console.log("Body == ", message.body);
+    return console.log(console.log("msgSID = ", message.sid));
+  } catch (err) {
+    console.log("Error =", err.message);
+    return err.message;
+  }
+};
 
 const checkStaffCardsService = async () => {
   const staffExpCardDates = await Staff.find().select(
     "firstName lastName email phoneNumber license medicalCard status"
   );
+
+  //? testing sms service
+  /* thei is an error :-
+  The From phone number +252617156305 is not a valid, SMS-capable 
+  inbound phone number or short code for your account.
+  */
+  sendSms();
 
   let reusltOfCards = [];
   for (let i = 0; i < staffExpCardDates.length; i++) {
@@ -262,5 +287,19 @@ const checkStaffCardsService = async () => {
   }
   return reusltOfCards;
 };
+
+/*
+=> notifications model need some updates
+[] adding a title field  example :"staff notification medical card will expire soon"
+[] adding a message field  example :"naadir's medical card will expire after 3-month and it's email is nadir@gmail.com"
+[] - removing a status field.
+[] renaming a notificationStatus to status
+[] renaming a notificationType to type.
+
+=> get api for notification.
+modelName.find({})
+clg the model.
+set pagination to 5 per page.
+*/
 
 module.exports = checkStaffCardsService;
