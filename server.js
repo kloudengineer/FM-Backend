@@ -27,7 +27,7 @@ dbConn.connect();
 // cron.schedule("*/1 * * * *", async () => {
 //   try {
 //     const notifications = await axios.get(
-//       "http://localhost:5000/api/v1/staff-notification"
+//       "http://localhost:5000/api/v1/staff-notification-list"
 //     );
 //     return notifications;
 //   } catch (err) {

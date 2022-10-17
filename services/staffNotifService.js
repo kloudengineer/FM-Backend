@@ -245,6 +245,7 @@ const sendSms = async () => {
 };
 
 const checkStaffCardsService = async () => {
+  getNotificationsList();
   const staffExpCardDates = await Staff.find().select(
     "firstName lastName email phoneNumber license medicalCard status"
   );
@@ -288,18 +289,37 @@ const checkStaffCardsService = async () => {
   return reusltOfCards;
 };
 
+// const total = await Notifications.countDocuments();
+// const notification = await Notifications.find({ refId: staffId }) if user auth == to success;
+//get where isRead is falsel
+const getNotificationsList = async (page, limit) => {
+  try {
+    console.log("page=", page);
+    console.log("limit=", limit);
+    const notification = await Notifications.find()
+      .limit(limit * 1)
+      .skip((page - 1) * limit)
+      .exec();
+    console.log("result=", notification);
+    return notification;
+  } catch (err) {
+    console.log("err = ", err.message);
+    return err.message;
+  }
+};
+// currentPage = pageNumber;
+// numberOfPages = Math.ceil(total / limit);
 /*
 => notifications model need some updates
-[] adding a title field  example :"staff notification medical card will expire soon"
-[] adding a message field  example :"naadir's medical card will expire after 3-month and it's email is nadir@gmail.com"
-[] - removing a status field.
-[] renaming a notificationStatus to status
-[] renaming a notificationType to type.
+[x] adding a title field  example :"staff notification medical card will expire soon"
+[x] adding a message field  example :"naadir's medical card will expire after 3-month and it's email is nadir@gmail.com"
+[x] - removing a status field.
+[x] renaming a notificationStatus to status
+[x] renaming a notificationType to type.
+[x] adding a isRead dataType is boolean default: false. true if user click it
+ and send api req to backend to set it ture
 
-=> get api for notification.
-modelName.find({})
-clg the model.
-set pagination to 5 per page.
+=> [x]get api for notification.
 */
 
-module.exports = checkStaffCardsService;
+module.exports = { checkStaffCardsService, getNotificationsList };

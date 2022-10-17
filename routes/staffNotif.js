@@ -9,7 +9,7 @@ const {
 
 router.get("/staff-notification", checkStaffCards);
 router.put("/staff-notification/:id", updateStaffNotification);
-router.get("/staff-notification-list", getStaffNotificationList);
+router.get("/staff-notification-list/:page/:limit", getStaffNotificationList);
 router.delete("/staff-notification/:id", deleteStaffNotification);
 
 module.exports = router;
