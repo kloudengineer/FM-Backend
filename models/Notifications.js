@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 const notificationsSchema = new mongoose.Schema(
   {
+    carrierId: { type: String, ref: "Carrier" },
+    action: { type: String, required: true },
     title: { type: String, required: true },
     message: { type: String, required: true },
     type: { type: String, required: true },
@@ -10,7 +12,7 @@ const notificationsSchema = new mongoose.Schema(
       enum: ["Limited", "Avaliable"],
       default: "Avaliable",
     },
-    carrierId: { type: mongoose.Schema.Types.ObjectId, ref: "Carrier" },
+    refId: { type: mongoose.Schema.Types.ObjectId, ref: "Staff" },
     isUnRead: { type: Boolean, default: true },
   },
   { timestamps: true }

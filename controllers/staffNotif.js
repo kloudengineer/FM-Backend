@@ -1,11 +1,14 @@
-const checkStaffCardsService = require("../services/staffNotifService");
+const { checkStaffCardsService } = require("../services/staffNotifService");
 const Staff = require("../models/Staff");
-const Notifications = require("../models/Notifications");
 
 const { getNotificationsList } = require("../services/staffNotifService");
 exports.checkStaffCards = async (req, res) => {
   try {
-    const staffCardResult = await checkStaffCardsService();
+    const { uid } = req.user;
+    const staff = await Staff.findOne({ uid }).exec();
+    const { carrierId } = staff;
+
+    const staffCardResult = await checkStaffCardsService(carrierId);
     res.status(200).json(staffCardResult);
   } catch (err) {
     //status 500
@@ -13,25 +16,25 @@ exports.checkStaffCards = async (req, res) => {
   }
 };
 
-exports.updateStaffNotification = async (req, res) => {
-  res.json("update staff notification");
-};
 exports.getStaffNotificationList = async (req, res) => {
-  //get only first 5 notif.
-  //?were isRead is false -> to get newest notif.
   try {
-    // const { uid } = req.user; we will use it wen auth the user.
-    // const staff = await Staff.findOne({ uid }).exec();
-    // const { _id } = staff;
-    const page = parseInt(req.params.page);
-    const limit = parseInt(req.params.limit);
+    const { uid } = req.user;
+    const staff = await Staff.findOne({ uid }).exec();
+    const { carrierId } = staff;
 
-    const result = await getNotificationsList(page, limit);
+    const page = 1;
+    const limit = 5;
+
+    const result = await getNotificationsList(page, limit, carrierId);
     res.json(result);
   } catch (e) {
     console.log("e =", e.message);
   }
 };
+exports.updateStaffNotification = async (req, res) => {
+  res.json("update staff notification");
+};
+
 exports.deleteStaffNotification = async (req, res) => {
   res.json("delete staff notification");
 };

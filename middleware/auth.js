@@ -16,6 +16,7 @@ async function verifyToken(req, res, next) {
 
     return res.status(HTTP_STATUS_CODES.NOT_AUTHORIZED).send("Unauthorized!");
   } catch (e) {
+    console.log("Error", e);
     return res
       .status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR)
       .send(`Internal Server Error: ${e}`);

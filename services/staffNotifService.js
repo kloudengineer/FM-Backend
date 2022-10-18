@@ -6,9 +6,9 @@ const {
   emailTemplate2,
 } = require("../documents/emailTemplate.js");
 //twilio
-const accountSid = process.env.TWILIO_ACCOUNT_SID;
-const authToken = process.env.TWILIO_AUTH_TOKEN;
-const client = require("twilio")(accountSid, authToken);
+// const accountSid = process.env.TWILIO_ACCOUNT_SID;
+// const authToken = process.env.TWILIO_AUTH_TOKEN;
+// const client = require("twilio")(accountSid, authToken);
 
 const calculateDateDifference = (d2, getBy) => {
   let date1 = new Date(Date.now());
@@ -48,10 +48,8 @@ const checkAdminNotifRes = async (
     if (differenceInDay == 3) {
       try {
         staffNotification.count += 1;
-        const newNotif = await staffNotification.save();
-        const { action, status } = newNotif;
-        emailSend(firstName, action, expDate, email, type, emailType);
-        return `an email sent about : ${firstName}'s ${action} and it's status : ${status} \nplease check your email`;
+        await staffNotification.save();
+        emailSend(firstName, cardName, expDate, email, type, emailType);
       } catch (err) {
         return err.message;
       }
@@ -63,10 +61,8 @@ const checkAdminNotifRes = async (
     if (differenceInDay == 6) {
       try {
         staffNotification.count += 1;
-        const newNotif = await staffNotification.save();
-        const { firstName, cardName } = newNotif;
+        await staffNotification.save();
         emailSend(firstName, cardName, expDate, email, type, emailType);
-        return `an email sent about : ${firstName}'s ${cardName} to your email please check it`;
       } catch (err) {
         return err.message;
       }
@@ -78,8 +74,7 @@ const checkAdminNotifRes = async (
     if (differenceInDay == 9) {
       try {
         staffNotification.count += 1;
-        const newNotif = await staffNotification.save();
-        const { firstName, cardName } = newNotif;
+        await staffNotification.save();
         emailSend(
           firstName,
           cardName,
@@ -89,7 +84,6 @@ const checkAdminNotifRes = async (
           emailType,
           staffNotification.count
         );
-        return `an email sent about : ${firstName}'s ${cardName} to your email please check it`;
       } catch (err) {
         return err.message;
       }
@@ -100,6 +94,7 @@ const checkAdminNotifRes = async (
 };
 const checkCardExpiration = async (
   expDate,
+  carrierId,
   userID,
   firstName,
   email,
@@ -115,20 +110,22 @@ const checkCardExpiration = async (
   })
     .where("action")
     .equals(cardName);
+  console.log("carrierID=", carrierId);
 
   if (expDate >= -3 && expDate <= 0 && status !== "In Review") {
     if (!staffNotification) {
       try {
         const newNotification = {
+          carrierId,
           action: cardName,
-          notificationType: "staff notification",
-          status: "Warning",
+          title: `Warning about : ${firstName}'s ${cardName}`,
+          message: `Warning : ${firstName}'s ${cardName} will expire after ${expDate} month`,
+          type: "staff notification",
           refId: userID,
         };
-        const newNotif = await new Notifications(newNotification).save();
-        const { action, status } = newNotif;
-        emailSend(firstName, action, expDate, email, "Warning", "first");
-        return `an email sent about : ${firstName}'s ${action} and it's status : ${status} \nplease check your email`;
+        await new Notifications(newNotification).save();
+        emailSend(firstName, cardName, expDate, email, "Warning", "first");
+        return `Warning : ${firstName}'s ${cardName}  will expire after ${expDate} month`;
       } catch (err) {
         return err.message;
       }
@@ -147,25 +144,19 @@ const checkCardExpiration = async (
     if (!staffNotification || staffNotification.status !== "Inactive") {
       try {
         const newNotification = {
+          carrierId,
           action: cardName,
-          notificationType: "staff notification",
-          status: "Inactive",
+          title: `Inactivation : ${firstName}'s ${cardName}`,
+          message: `User inactivation : ${firstName}'s ${cardName} expired before ${expDate} month ago`,
+          type: "staff notification",
           refId: userID,
         };
-        const newNotif = await new Notifications(newNotification).save();
-        const { action, status } = newNotif;
+        await new Notifications(newNotification).save();
         //staff status updating.
         staffExpCardDates[0].status = "Inactive";
         await staffExpCardDates[0].save();
-        emailSend(
-          firstName,
-          result.action,
-          expDate,
-          email,
-          "Inactive",
-          "first"
-        );
-        return `an email sent about : ${firstName}'s ${action} and it's status : ${status} we set staff status : ${staffExpCardDates[0].status}\nplease check your email`;
+        emailSend(firstName, cardName, expDate, email, "Inactive", "first");
+        return `User inactivation : ${firstName}'s ${cardName} expired before ${expDate} month ago, and we set it's status : ${staffExpCardDates[0].status}`;
       } catch (err) {
         return err.message;
       }
@@ -210,8 +201,7 @@ const emailSend = async (
         to: "abdiaziiz1856@gmail.com",
         replyTo: "naadir@kloudeng.com",
         subject: `Their is a warning from Kloud Engineering  for you Mr/Mss Abdiaziiz Abdullahi`,
-        text: "Their is a warning from Kloud Engineering  for you Mr/Mss Abdiaziiz Abdullahi",
-        html: emailTemplate(firstName, cardName, expDate, email, type), // html body if warining call warning template_email
+        text: emailTemplate(firstName, cardName, expDate, email, type), // html body if warining call warning template_email
       });
       return sendFirstEmail;
     } else {
@@ -220,8 +210,7 @@ const emailSend = async (
         to: "abdiaziiz1856@gmail.com",
         replyTo: "naadir@kloudeng.com",
         subject: `Their is a warning from Kloud Engineering  for you Mr/Mss Abdiaziiz Abdullahi`,
-        text: "Their is a warning from Kloud Engineering  for you Mr/Mss Abdiaziiz Abdullahi",
-        html: emailTemplate2(firstName, cardName, expDate, email, type, count), // html body if warning call warning template_email
+        text: emailTemplate2(firstName, cardName, expDate, email, type, count), // html body if warning call warning template_email
       });
       return sendSecondEmail;
     }
@@ -244,18 +233,16 @@ const sendSms = async () => {
   }
 };
 
-const checkStaffCardsService = async () => {
-  getNotificationsList();
+const checkStaffCardsService = async (carrierId) => {
   const staffExpCardDates = await Staff.find().select(
     "firstName lastName email phoneNumber license medicalCard status"
   );
-
   //? testing sms service
   /* thei is an error :-
   The From phone number +252617156305 is not a valid, SMS-capable 
   inbound phone number or short code for your account.
   */
-  sendSms();
+  // sendSms();
 
   let reusltOfCards = [];
   for (let i = 0; i < staffExpCardDates.length; i++) {
@@ -270,6 +257,7 @@ const checkStaffCardsService = async () => {
 
     let license_Result = await checkCardExpiration(
       licenseCardResult,
+      carrierId,
       staffExpCardDates[i]._id,
       staffExpCardDates[i].firstName,
       staffExpCardDates[i].email,
@@ -278,6 +266,7 @@ const checkStaffCardsService = async () => {
     );
     let medical_Result = await checkCardExpiration(
       medicalCardResult,
+      carrierId,
       staffExpCardDates[i]._id,
       staffExpCardDates[i].firstName,
       staffExpCardDates[i].email,
@@ -289,37 +278,20 @@ const checkStaffCardsService = async () => {
   return reusltOfCards;
 };
 
-// const total = await Notifications.countDocuments();
-// const notification = await Notifications.find({ refId: staffId }) if user auth == to success;
-//get where isRead is falsel
-const getNotificationsList = async (page, limit) => {
+const getNotificationsList = async (page, limit, carrierId) => {
   try {
-    console.log("page=", page);
-    console.log("limit=", limit);
-    const notification = await Notifications.find()
+    const notification = await Notifications.find({ carrierId: carrierId })
       .limit(limit * 1)
       .skip((page - 1) * limit)
       .exec();
-    console.log("result=", notification);
-    return notification;
+
+    return {
+      data: notification,
+    };
   } catch (err) {
     console.log("err = ", err.message);
     return err.message;
   }
 };
-// currentPage = pageNumber;
-// numberOfPages = Math.ceil(total / limit);
-/*
-=> notifications model need some updates
-[x] adding a title field  example :"staff notification medical card will expire soon"
-[x] adding a message field  example :"naadir's medical card will expire after 3-month and it's email is nadir@gmail.com"
-[x] - removing a status field.
-[x] renaming a notificationStatus to status
-[x] renaming a notificationType to type.
-[x] adding a isRead dataType is boolean default: false. true if user click it
- and send api req to backend to set it ture
-
-=> [x]get api for notification.
-*/
 
 module.exports = { checkStaffCardsService, getNotificationsList };
