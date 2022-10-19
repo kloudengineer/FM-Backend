@@ -280,6 +280,7 @@ const checkStaffCardsService = async (carrierId) => {
 
 const getNotificationsList = async (page, limit, carrierId) => {
   try {
+    //where type == staff-notification
     const notification = await Notifications.find({ carrierId: carrierId })
       .limit(limit * 1)
       .skip((page - 1) * limit)

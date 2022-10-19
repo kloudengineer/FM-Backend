@@ -1,7 +1,9 @@
-const { checkStaffCardsService } = require("../services/staffNotifService");
+const {
+  checkStaffCardsService,
+  getNotificationsList,
+} = require("../services/staffNotifService");
 const Staff = require("../models/Staff");
 
-const { getNotificationsList } = require("../services/staffNotifService");
 exports.checkStaffCards = async (req, res) => {
   try {
     const { uid } = req.user;
@@ -31,6 +33,11 @@ exports.getStaffNotificationList = async (req, res) => {
     console.log("e =", e.message);
   }
 };
+
+exports.getStaffNotification = async (req, res) => {
+  res.json("staff notification profile ");
+};
+
 exports.updateStaffNotification = async (req, res) => {
   res.json("update staff notification");
 };
