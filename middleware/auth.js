@@ -4,11 +4,10 @@ const { HTTP_STATUS_CODES } = require('../configs/constants')
 async function verifyToken(req, res, next){
 
   const token = req.headers?.authorization?.split(' ')[1];
-
   try {
     if (token) {
       const decodedToken = await admin.auth().verifyIdToken(token)
-
+  
       if (decodedToken){
         req.user = decodedToken
         return next()

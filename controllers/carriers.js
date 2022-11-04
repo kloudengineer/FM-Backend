@@ -25,6 +25,7 @@ exports.createCarrier = async(req, res) => {
     firstName, lastName, phoneNumber, email, companyName, registration, address, ein, dot
   } = req.body
 
+
   const newCarrier = {
     firstName, lastName, phoneNumber, email, companyName, registration, address, ein, dot
   }

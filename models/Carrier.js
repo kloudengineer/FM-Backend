@@ -6,7 +6,11 @@ const carrierSchema = new mongoose.Schema(
     firstName: { type: String },
     lastName: { type: String },
     phoneNumber: { type: String },
-    email: { type: String },
+    email: { 
+      type: String,
+      unique: true,
+      trim:true
+     },
     companyName: { type: String },
     registration: { type: String },
     address: { type: String },
@@ -15,7 +19,9 @@ const carrierSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: ['In Review', 'Active', 'Inactive']
-    }
+    },
+    stripe_customer_id:String,
+    subscriptions:[]
   },
   { timestamps: true }
 );
