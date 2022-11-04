@@ -12,7 +12,7 @@ const notificationsSchema = new mongoose.Schema(
       enum: ["Limited", "Avaliable"],
       default: "Avaliable",
     },
-    refId: { type: mongoose.Schema.Types.ObjectId, ref: "Staff" },
+    refId: { type: mongoose.Schema.Types.ObjectId, ref: "Carrier" },
     isUnRead: { type: Boolean, default: true },
   },
   { timestamps: true }

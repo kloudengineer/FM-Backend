@@ -5,7 +5,7 @@ exports.emailTemplate = (firstName, cardName, expDate, email, type) => {
       it's ${cardName} expired before ${expDate}-month ago and it's email : ${email} `;
 };
 exports.emailTemplate2 = (firstName, cardName, expDate, email, type, count) => {
-  return count == 3
+  return count == 9
     ? type === "Warning"
       ? `Warning ${firstName}'s ${cardName} will expire after ${expDate}-month and it's email : ${email}\n
    this is the last notification about this event because you reached the limit`

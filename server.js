@@ -4,7 +4,7 @@ const dotenv = require("dotenv");
 const { readdirSync } = require("fs");
 const cron = require("node-cron");
 const axios = require("axios");
-
+const morgan = require("morgan");
 if (process.env.NODE_ENV !== "production") {
   dotenv.config();
 }
@@ -17,20 +17,23 @@ const app = express();
 //? call notification api.
 //*/1 * * * * run every minute one time.
 //*0 */12 * * * run this api every 12 hour one time.
-// cron.schedule("*/1 * * * *", async () => {
-//   try {
-//     const notifications = await axios.get(
-//       "http://localhost:5000/api/v1/staff-notification"
-//     );
-//     return notifications;
-//   } catch (err) {
-//     console.log(err.message);
-//     return err.message;
-//   }
-// });
+
+cron.schedule("*/1 * * * *", async () => {
+  try {
+    const notifications = await axios.get(
+      "http://localhost:5000/api/v1/notifications/staff-check"
+    );
+    console.log("notif=", notifications.data);
+  } catch (err) {
+    console.log(err.message);
+    return err.message;
+  }
+});
 
 app.use(cors());
-app.use(verifyToken);
+// app.use(verifyToken);
+
+app.use(morgan("dev"));
 app.use(express.json({ limit: "50MB" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 dbConn.connect();
