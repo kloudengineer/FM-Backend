@@ -24,6 +24,9 @@ const createSubscription = async (req, res) => {
             quantity: 1,
           },
         ],
+        subscription_data: {
+          trial_period_days: 14
+        },
         customer: carrier.stripe_customer_id,
         success_url: process.env.STRIPE_SUCCESS_URL,
         cancel_url: process.env.STRIPE_CANCEL_URL,
@@ -62,10 +65,27 @@ const subscriptionStatus = async (req, res) => {
     }
   };
 
+//Get subscriptions
+  const subscriptions = async (req, res) => {
+    try {
+      const {uid}=req.user;
+      const carrier = await Carrier.findOne({uid});
+      const subscriptions = await stripe.subscriptions.list({
+        customer: carrier.stripe_customer_id,
+        status: "all",
+        expand: ["data.default_payment_method"],
+      });
+  
+      res.json(subscriptions);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  
 
 module.exports={
     prices,
     createSubscription,
     subscriptionStatus,
-    
+    subscriptions
 }
