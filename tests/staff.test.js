@@ -132,7 +132,6 @@ describe("STAFF APIs - LIST", () => {
             .set("Authorization", userToken)
             .expect(200)
             .then((res) => {
-                slug = res.body.slug;
                 expect(res.body).toEqual({
                     staff: expect.arrayContaining([]),
                 });
