@@ -111,7 +111,7 @@ describe("ROUTES APIs - LIST", () => {
                 });
             });
     });
-    it("POST /routes  --> Create Route & return Array of objects", async() => {
+    it("PUT /routes  --> Create Route & return Array of objects", async() => {
         await request(app)
             .put("/api/v1/routes/63847d2f180485d83df9f9f2")
             .set("Authorization", userToken)
